@@ -1,6 +1,7 @@
 import tkinter as tk
+from functools import partial
 
-largeFont = ("Verdana", 12)
+largeFont = ("Verdana",20)
 
 class backEnd(tk.Tk): # pass in Tk module of tk
 
@@ -21,6 +22,9 @@ class backEnd(tk.Tk): # pass in Tk module of tk
         # methods in this class (e.g. showFrame)
         self.frames[StartPage].grid(row = 0, column = 0, sticky = 'nesw')
 
+        self.frames[TeacherMenu] = TeacherMenu(parent = container, controller = self)
+        self.frames[TeacherMenu].grid(row = 0, column = 0, sticky = 'nesw')
+
         # must be called in __init__ function to open StartPage as soon as program run
         self.showFrame(StartPage)
 
@@ -37,12 +41,27 @@ class StartPage(tk.Frame): # we inherit from tk.Frame to use all widgets related
         self.controller = controller    # its Frame object is stored in 'container' (along with all other pages in the app)
         self.rowconfigure(0, weight = 1)
         self.columnconfigure(0, weight = 1)
+        self.columnconfigure(1, weight = 1)
 
-        teacherButton = tk.Button(self, text = 'Teacher')
-        teacherButton.grid(row = 0, column = 0, sticky = 'nesw')
+        teacherButton = tk.Button(self, text = 'Teacher', font = largeFont, command = lambda:self.controller.showFrame(TeacherMenu))
+        teacherButton.grid(row = 0, column = 0, sticky = 'nesw', padx = (10, 25), pady = 50)
+        # padx can take a tuple to pad left and right by different amounts (left, right)
 
-        studentButton = tk.Button(self, text = 'Student')
-        studentButton.grid(row = 0, column = 1, sticky = 'nesw')
+        studentButton = tk.Button(self, text = 'Student', font = largeFont)
+        studentButton.grid(row = 0, column = 1, sticky = 'nesw', padx = (25, 10), pady = 50)
+
+class TeacherMenu(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        button1 = tk.Button(self, text = 'button1')
+        button1.pack(side = tk.TOP)
+        button2 = tk.Button(self, text = 'button2')
+        button2.pack(side = tk.TOP)
+
+
 
 
 app = backEnd() # equivilant of root = Tk (since backEnd() inherits from Tk)
