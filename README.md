@@ -12,3 +12,13 @@ https://stackoverflow.com/questions/4246353/how-to-increase-the-font-size-of-a-t
 https://effbot.org/tkinterbook/optionmenu.htm#:~:text=The%20OptionMenu%20class%20is%20a,patterns%20section%20for%20some%20examples.
 https://www.reddit.com/r/learnpython/comments/6996k6/tkinter_optionmenu_font_size/
 https://stackoverflow.com/questions/18265935/python-create-list-with-numbers-between-2-values
+
+Returning data from tkinter Entry box (use self.varname = tk.Entry then use self.varname.get()): https://stackoverflow.com/questions/10727131/why-is-tkinter-entrys-get-function-returning-nothing
+Returning data from tkinter OptionMenu (use self.variable.get() where self.variable is the dropdown list's label - what it currently shows):
+https://effbot.org/tkinterbook/optionmenu.htm
+
+Creating a database: https://www.youtube.com/watch?v=o-vsdfCBpsU
+https://stackoverflow.com/questions/902408/how-to-use-variables-in-sql-statement-in-python
+https://stackoverflow.com/questions/23770480/sqlite-table-and-column-name-requirements
+
+Declaring multiple variables on the same line: https://stackoverflow.com/questions/5495332/more-elegant-way-of-declaring-multiple-variables-at-the-same-time
