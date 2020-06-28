@@ -1,5 +1,9 @@
 import tkinter as tk
 from functools import partial
+import sqlite3
+
+conn = sqlite3.connect('school.db')
+cursor = conn.cursor()
 
 largeFont = ("Verdana",20)
 mediumFont = font = ("Verdana",15)
@@ -83,27 +87,49 @@ class AddClass(tk.Frame):
 
         years = ['Year 7', 'Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12', 'Year 13']
         classSize = list(range(1,31))
-        yearOptionsLabel = tk.StringVar(self)
-        yearOptionsLabel.set('Year')
-        sizeOptionsLabel = tk.StringVar(self)
-        sizeOptionsLabel.set('Size')
+        self.yearOptionsLabel = tk.StringVar(self)
+        self.yearOptionsLabel.set('Year')
+        self.sizeOptionsLabel = tk.StringVar(self)
+        self.sizeOptionsLabel.set('Size')
 
-        classNameLabel = tk.Label(self, text = 'Class Name:', font = largeFont)
-        classNameLabel.grid(column = 1, row = 1, padx = (50,10), pady = (50,25), sticky = 'w')
-        classNameBox = tk.Text(self, height = 1, width = 30, font = mediumFont)
-        classNameBox.grid(column = 2, row = 1, pady = (50,25))
+        self.classNameLabel = tk.Label(self, text = 'Class Name:', font = largeFont)
+        self.classNameLabel.grid(column = 1, row = 1, padx = (50,10), pady = (50,25), sticky = 'w')
+        self.classNameBox = tk.Entry(self,width = 30, font = mediumFont)
+        self.classNameBox.grid(column = 2, row = 1, pady = (50,25))
 
-        yearGroupLabel = tk.Label(self, text  = 'Year Group:', font = largeFont)
-        yearGroupLabel.grid(column = 1, row = 3, padx = (50,0), pady = 25, sticky = 'w')
-        yearGroupOptions = tk.OptionMenu(self,yearOptionsLabel,*years)
-        yearGroupOptions.config(font = mediumFont)
-        yearGroupOptions.grid(column = 2, row = 3, pady = 25, sticky = 'w')
+        self.yearGroupLabel = tk.Label(self, text  = 'Year Group:', font = largeFont)
+        self.yearGroupLabel.grid(column = 1, row = 3, padx = (50,0), pady = 25, sticky = 'w')
+        self.yearGroupOptions = tk.OptionMenu(self,self.yearOptionsLabel,*years)
+        self.yearGroupOptions.config(font = mediumFont)
+        self.yearGroupOptions.grid(column = 2, row = 3, pady = 25, sticky = 'w')
 
-        maxClassSizeLabel = tk.Label(self, text = 'Maximum Class Size:', font = largeFont)
-        maxClassSizeLabel.grid(column = 1, row = 5, padx = (50,0), pady = 25, sticky = 'w')
-        maxClassSizeOptions = tk.OptionMenu(self, sizeOptionsLabel, *classSize)
-        maxClassSizeOptions.config(font = mediumFont)
-        maxClassSizeOptions.grid(column = 2, row = 5, pady = 25, sticky = 'w')
+        self.maxClassSizeLabel = tk.Label(self, text = 'Maximum Class Size:', font = largeFont)
+        self.maxClassSizeLabel.grid(column = 1, row = 5, padx = (50,0), pady = 25, sticky = 'w')
+        self.maxClassSizeOptions = tk.OptionMenu(self, self.sizeOptionsLabel, *classSize)
+        self.maxClassSizeOptions.config(font = mediumFont)
+        self.maxClassSizeOptions.grid(column = 2, row = 5, pady = 25, sticky = 'w')
+
+        self.submitButton = tk.Button(self, text = 'Submit', font = mediumFont,
+         command = self.addValues)
+        self.submitButton.grid(column = 1, row = 7, padx = (50,0), pady = 25, sticky = 'w')
+
+    def addValues(self):
+        className, yearGroup, maxSize = self.classNameBox.get(), self.yearOptionsLabel.get(), self.sizeOptionsLabel.get()
+        # assigns multiple variables together
+        # self.yearOptionsLabel.get() returns current value of year drop down list
+        print(className, yearGroup, maxSize+' are the values')
+
+        if (className == '' or yearGroup == 'Year' or maxSize == 'Size'):
+            print('Do not leave values empty.')
+
+        # use try except structure for creating a class with an existing primary key
+        # error: sqlite3.IntegrityError
+
+
+        with conn:
+            cursor.execute("INSERT INTO classes VALUES (?,?,?)", (className, yearGroup, maxSize))
+
+
 
 
 
