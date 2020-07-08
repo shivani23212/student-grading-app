@@ -33,14 +33,20 @@ class backEnd(tk.Tk): # pass in Tk module of tk
         self.frames[AddClass] = AddClass(parent = container, controller = self)
         self.frames[AddClass].grid(row = 0, column = 0, sticky = 'nesw')
 
+        self.frames[AddStudent] = AddStudent(parent = container,controller = self)
+        self.frames[AddStudent].grid(row = 0, column = 0, sticky = 'nesw')
+
         # must be called in __init__ function to open StartPage as soon as program run
         self.showFrame(StartPage)
 
     def showFrame(self, pageName):
         frame = self.frames[pageName]
         frame.tkraise()
+    
+    def updateClassList(self):
+        self.classes = [Name[0] for Name in cursor.execute("SELECT Name FROM classes")]
+        return self.classes
         
-
 
 class StartPage(tk.Frame): # we inherit from tk.Frame to use all widgets related to Frame (e.g. rowconfigure)
 
@@ -67,7 +73,7 @@ class TeacherMenu(tk.Frame):
 
         addClass = tk.Button(self, text = 'Add new class', height = 3, width = 60, command = lambda: self.controller.showFrame(AddClass))
         addClass.pack(side = tk.TOP, pady = (175,20))
-        addStudent = tk.Button(self, text = 'Add new student', height = 3, width = 60)
+        addStudent = tk.Button(self, text = 'Add new student', height = 3, width = 60, command = lambda: self.controller.showFrame(AddStudent))
         addStudent.pack(side = tk.TOP, pady = 20)
         addGrades = tk.Button(self, text = 'Add new grades', height = 3, width = 60)
         addGrades.pack(side = tk.TOP, pady = 20)
@@ -85,7 +91,7 @@ class AddClass(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        years = ['Year 7', 'Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12', 'Year 13']
+        years = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6']
         classSize = list(range(1,31))
         self.yearOptionsLabel = tk.StringVar(self)
         self.yearOptionsLabel.set('Year')
@@ -109,25 +115,64 @@ class AddClass(tk.Frame):
         self.maxClassSizeOptions.config(font = mediumFont)
         self.maxClassSizeOptions.grid(column = 2, row = 5, pady = 25, sticky = 'w')
 
+        self.backButton = tk.Button(self, text = 'Back', font = mediumFont, command = lambda: self.controller.showFrame(TeacherMenu))
+        self.backButton.grid(column = 1, row = 7, padx = (50,0), pady = 25, sticky = 'w')
         self.submitButton = tk.Button(self, text = 'Submit', font = mediumFont,
          command = self.addValues)
-        self.submitButton.grid(column = 1, row = 7, padx = (50,0), pady = 25, sticky = 'w')
+        self.submitButton.grid(column = 2, row = 7, padx = (50,0), pady = 25, sticky = 'e')
 
     def addValues(self):
         className, yearGroup, maxSize = self.classNameBox.get(), self.yearOptionsLabel.get(), self.sizeOptionsLabel.get()
         # assigns multiple variables together
         # self.yearOptionsLabel.get() returns current value of year drop down list
-        print(className, yearGroup, maxSize+' are the values')
 
-        if (className == '' or yearGroup == 'Year' or maxSize == 'Size'):
-            print('Do not leave values empty.')
+        try: # prevents program crashing if exisiting class name entered
+            if (className == '' or yearGroup == 'Year' or maxSize == 'Size'): # if field empty display error message
+                errorMessage = tk.Label(self, text = 'Fill in all fields', font = mediumFont)
+                errorMessage.grid(column = 1, padx = (50,0), row = 9, sticky = 'w')
+            else:
+                with conn:
+                    cursor.execute("INSERT INTO classes VALUES (?,?,?)", (className, yearGroup, maxSize))
+                acceptanceMessage = tk.Label(self, text = 'Class added', font = mediumFont)
+                acceptanceMessage.grid(column = 1, padx = (50,0), row = 9, sticky = 'w')
+                var = tk.StringVar(self)
+                self.controller.frames[AddStudent].classNameList['menu'].add_command(label = 'QWEEWQ', command = tk._setit(var, 'QWEEWQ', None))
+                self.controller.frames[AddStudent].updatedList.append('QWEEQ')
+                print(className,self.controller.frames[AddStudent].classNameMenuLabel.get(), 'hi')
+        except sqlite3.IntegrityError:
+            errorMessage = tk.Label(self, text = 'Enter a unique class name', font = mediumFont)
+            errorMessage.grid(column = 1, padx = (50,0), row = 9, sticky = 'w')
 
-        # use try except structure for creating a class with an existing primary key
-        # error: sqlite3.IntegrityError
+class AddStudent(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        # self.classes does not include name of class added just before this page clicked
+        # (if i add a class then go on this page, the class i added is not here)
+        self.updatedList = self.controller.updateClassList()
+        #print(self.updatedList) # ISSUE: The updatedList is created as soon as the program is opened.
+
+        self.hi = 'hi'
+        self.classNameMenuLabel = tk.StringVar(self)
+        self.classNameMenuLabel.set('Class')
+
+        self.firstNameLabel = tk.Label(self, text = 'First Name:', font = largeFont)
+        self.firstNameLabel.grid(column = 1, row = 1, padx = (50,10), pady = (50,25), sticky = 'w')
+        self.firstNameBox = tk.Entry(self,width = 30, font = mediumFont)
+        self.firstNameBox.grid(column = 2, row = 1, pady = (50,25))
+        self.lastNameLabel = tk.Label(self, text = 'Surname:', font = largeFont)
+        self.lastNameLabel.grid(column = 1, row = 3, padx = (50,10), pady = 25, sticky = 'w')
+        self.lastNameBox = tk.Entry(self,width = 30, font = mediumFont)
+        self.lastNameBox.grid(column = 2, row = 3, pady = 25)
+        self.classNameLabel = tk.Label(self, text = 'Class:', font = largeFont)
+        self.classNameLabel.grid(column = 1, row = 5, padx = (50,0), pady = 25, sticky = 'w')
+        self.classNameList = tk.OptionMenu(self, self.classNameMenuLabel, *self.updatedList)
+        self.classNameList.config(font = mediumFont)
+        self.classNameList.grid(column = 2, row = 5, pady = 25, sticky = 'w')
 
 
-        with conn:
-            cursor.execute("INSERT INTO classes VALUES (?,?,?)", (className, yearGroup, maxSize))
 
 
 
