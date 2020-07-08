@@ -42,10 +42,6 @@ class backEnd(tk.Tk): # pass in Tk module of tk
     def showFrame(self, pageName):
         frame = self.frames[pageName]
         frame.tkraise()
-    
-    def updateClassList(self):
-        self.classes = [Name[0] for Name in cursor.execute("SELECT Name FROM classes")]
-        return self.classes
         
 
 class StartPage(tk.Frame): # we inherit from tk.Frame to use all widgets related to Frame (e.g. rowconfigure)
@@ -135,10 +131,16 @@ class AddClass(tk.Frame):
                     cursor.execute("INSERT INTO classes VALUES (?,?,?)", (className, yearGroup, maxSize))
                 acceptanceMessage = tk.Label(self, text = 'Class added', font = mediumFont)
                 acceptanceMessage.grid(column = 1, padx = (50,0), row = 9, sticky = 'w')
-                var = tk.StringVar(self)
-                self.controller.frames[AddStudent].classNameList['menu'].add_command(label = 'QWEEWQ', command = tk._setit(var, 'QWEEWQ', None))
-                self.controller.frames[AddStudent].updatedList.append('QWEEQ')
-                print(className,self.controller.frames[AddStudent].classNameMenuLabel.get(), 'hi')
+
+                self.toAdd = tk.StringVar(self)
+                self.toAdd.set(className)
+                self.var2 = self.controller.frames[AddStudent].classNameMenuLabel
+                menu = self.controller.frames[AddStudent].classNameList['menu'] # getting dropdown list from AddStudent class
+                # label = value to add to list, command = set label of dropdown list (self.var2) to the new value when this
+                # value is clicked on
+                # menu.add_command(label=self.toAdd.get(), command=lambda a=self.toAdd.get(): self.var2.set(a))
+                menu.add_command(label=self.toAdd.get(), command= lambda: self.var2.set(self.toAdd.get()))
+
         except sqlite3.IntegrityError:
             errorMessage = tk.Label(self, text = 'Enter a unique class name', font = mediumFont)
             errorMessage.grid(column = 1, padx = (50,0), row = 9, sticky = 'w')
@@ -149,12 +151,9 @@ class AddStudent(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        # self.classes does not include name of class added just before this page clicked
-        # (if i add a class then go on this page, the class i added is not here)
-        self.updatedList = self.controller.updateClassList()
-        #print(self.updatedList) # ISSUE: The updatedList is created as soon as the program is opened.
-
-        self.hi = 'hi'
+        self.updatedList = [Name[0] for Name in cursor.execute("SELECT [Class Name] FROM classes")]
+        self.updatedList.append(None)
+ 
         self.classNameMenuLabel = tk.StringVar(self)
         self.classNameMenuLabel.set('Class')
 
@@ -168,9 +167,35 @@ class AddStudent(tk.Frame):
         self.lastNameBox.grid(column = 2, row = 3, pady = 25)
         self.classNameLabel = tk.Label(self, text = 'Class:', font = largeFont)
         self.classNameLabel.grid(column = 1, row = 5, padx = (50,0), pady = 25, sticky = 'w')
-        self.classNameList = tk.OptionMenu(self, self.classNameMenuLabel, *self.updatedList)
+        self.classNameList = tk.OptionMenu(self, self.classNameMenuLabel,*self.updatedList)
         self.classNameList.config(font = mediumFont)
         self.classNameList.grid(column = 2, row = 5, pady = 25, sticky = 'w')
+
+        self.submitButton = tk.Button(self, text = 'Submit', font = mediumFont, command = lambda: self.submitDetails())
+        self.submitButton.grid(column = 3, row = 7, pady = 30, sticky ='w')
+        self.backButton = tk.Button(self, text = 'Back', font = mediumFont, command =lambda: self.controller.showFrame(TeacherMenu))
+        self.backButton.grid(column = 1, row = 7, pady = 25,padx = (50), sticky = 'w')
+
+    def submitDetails(self):
+        self.firstName = self.firstNameBox.get()
+        self.lastName = self.lastNameBox.get()
+        self.className = self.classNameMenuLabel.get()
+      ##  try:
+        with conn:
+            cursor.execute('SELECT * FROM students WHERE [First Name] LIKE ? AND [Surname] LIKE ?',(self.firstName, self.lastName))
+            exists = cursor.fetchall()
+            if (exists != []):
+                print('already exists')
+                self.failureMsg = tk.Label(self, text = 'This student already exists', font = mediumFont)
+                self.failureMsg.grid(column = 3, row = 9, pady = 30, sticky = 'w')
+            else:
+                cursor.execute("INSERT INTO students VALUES (?,?,?)", (self.firstName, self.lastName, self.className))
+                self.successMsg = tk.Label(self, text = 'Student added                ', font = mediumFont)
+                self.successMsg.grid(column = 3, row = 9, pady = 30, sticky ='w')
+     #   except sqlite3.IntegrityError:
+     #       self.failureMsg = tk.Label(self, text = 'This student already exists', font = mediumFont)
+     #       self.failureMsg.grid(column = 3, row = 9, pady = 30, sticky = 'w')
+
 
 
 
