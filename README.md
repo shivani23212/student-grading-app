@@ -22,3 +22,5 @@ https://stackoverflow.com/questions/902408/how-to-use-variables-in-sql-statement
 https://stackoverflow.com/questions/23770480/sqlite-table-and-column-name-requirements
 
 Declaring multiple variables on the same line: https://stackoverflow.com/questions/5495332/more-elegant-way-of-declaring-multiple-variables-at-the-same-time
+
+Dropdown List Issue Solution: https://stackoverflow.com/questions/17252096/change-optionmenu-based-on-what-is-selected-in-another-optionmenu
