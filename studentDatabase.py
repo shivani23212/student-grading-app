@@ -17,9 +17,16 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS students(
                 [First Name] TEXT NOT NULL,
                 Surname TEXT NOT NULL,
                 Class TEXT NOT NULL,
+                Autumn1 REAL,
+                Autumn2 REAL,
+                Spring1 REAL,
+                Spring2 REAL,
+                Summer1 REAL,
+                Summer2 REAL,
                 PRIMARY KEY ([First Name], Surname),
                 FOREIGN KEY (Class) REFERENCES classes([Class Name])
                 )''')
-# add 
+# add table for test results : first name, last name, autm1, autm2, spr1, spr2, sum1, sum2
+# composite primary key: first and last name (also foreign key) -- or should i add this to the students table? 
 conn.commit()
 conn.close()
