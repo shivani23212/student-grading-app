@@ -24,3 +24,5 @@ https://stackoverflow.com/questions/23770480/sqlite-table-and-column-name-requir
 Declaring multiple variables on the same line: https://stackoverflow.com/questions/5495332/more-elegant-way-of-declaring-multiple-variables-at-the-same-time
 
 Dropdown List Issue Solution: https://stackoverflow.com/questions/17252096/change-optionmenu-based-on-what-is-selected-in-another-optionmenu
+
+Check whether value exists in table (Sqlite): https://stackoverflow.com/questions/45569344/how-to-tell-if-a-value-exists-in-a-sqlite3-database-python
