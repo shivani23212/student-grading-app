@@ -76,7 +76,7 @@ class TeacherMenu(tk.Frame):
         addStudent.pack(side = tk.TOP, pady = 20)
         addGrades = tk.Button(self, text = 'Add new grades', height = 3, width = 60, command = lambda: self.controller.showFrame(AddGrades))
         addGrades.pack(side = tk.TOP, pady = 20)
-        analyse = tk.Button(self, text = 'Analyse Grades', height = 3, width = 60)
+        analyse = tk.Button(self, text = 'View Grades', height = 3, width = 60)
         analyse.pack(side = tk.TOP, pady = 20)
         viewAll = tk.Button(self, text = 'View all students', height = 3, width = 60)
         viewAll.pack(side = tk.TOP, pady = 20)
@@ -244,13 +244,28 @@ class AddGrades(tk.Frame):
 
         percentage = (markAchieved/totalMark)*100
         percentage = round(percentage,2)
+        if percentage > 100:
+            percentage = 0
+            errorLabel = tk.Label(self, text = 'Enter a valid score', font = mediumFont)
+            errorLabel.grid(column = 2, row = 13, padx = 50, pady = 25, sticky = 'w')
 
         # print(percentage, self.label.get(), firstName, lastName)
 
         with conn:
-            cursor.execute("UPDATE students SET ("+ self.label.get()+") = ? WHERE [First Name] LIKE ? AND Surname LIKE ?",(percentage,
-            firstName, lastName))
-            # cursor.execute('SELECT * FROM students WHERE [First Name] LIKE ? AND [Surname] LIKE ?',(self.firstName, self.lastName))
+            cursor.execute('''SELECT [First Name], Surname FROM students WHERE [First Name] = ? AND [Surname]
+            = ? ''',(firstName, lastName))
+            result = cursor.fetchone()
+            if result:
+                cursor.execute("UPDATE students SET ("+ self.label.get()+") = ? WHERE [First Name] = ? AND Surname = ?",(percentage,
+                firstName, lastName))
+            
+                successLabel = tk.Label(self, text = 'Percentage Added          ', font = mediumFont)
+                successLabel.grid(column = 2, row = 13, padx = 50, pady = 25, sticky = 'w')
+            else:
+                
+                errorLabel = tk.Label(self, text = 'Student does not exist', font = mediumFont)
+                errorLabel.grid(column = 2, row = 13, padx = 50, pady = 25, sticky = 'w')
+
 
         # in future instead of 'first name' and 'surname' have 2 dropdown boxes
         # 1st: 'Class', once user chooses the class, the next dropdown ('Student') dynamically updates
