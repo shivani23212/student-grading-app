@@ -19,6 +19,9 @@ class backEnd(tk.Tk): # pass in Tk module of tk
 
         self.frames = {} # empty dict to store frames - when needed the frame is
         # brought to the top
+        self.studentClass = {}
+        self.allClasses = [Class[0] for Class in cursor.execute("SELECT [Class Name] FROM classes")] 
+        # self.updatedList = [Name[0] for Name in cursor.execute("SELECT [Class Name] FROM classes")]   
 
         # Storing StartPage frame - (Key: StartPage, value: StartPage object)
         self.frames[StartPage] = StartPage(parent = container, controller = self)
@@ -38,6 +41,10 @@ class backEnd(tk.Tk): # pass in Tk module of tk
 
         self.frames[AddGrades] = AddGrades(parent = container, controller = self)
         self.frames[AddGrades].grid(row = 0, column = 0, sticky = 'nesw')
+
+        self.frames[ViewGrades] = ViewGrades(parent = container, controller = self)
+        self.frames[ViewGrades].grid(row = 0, column = 0, sticky = 'nesw')
+
 
         # must be called in __init__ function to open StartPage as soon as program run
         self.showFrame(StartPage)
@@ -76,7 +83,7 @@ class TeacherMenu(tk.Frame):
         addStudent.pack(side = tk.TOP, pady = 20)
         addGrades = tk.Button(self, text = 'Add new grades', height = 3, width = 60, command = lambda: self.controller.showFrame(AddGrades))
         addGrades.pack(side = tk.TOP, pady = 20)
-        analyse = tk.Button(self, text = 'View Grades', height = 3, width = 60)
+        analyse = tk.Button(self, text = 'View Grades', height = 3, width = 60, command = lambda: self.controller.showFrame(ViewGrades))
         analyse.pack(side = tk.TOP, pady = 20)
         viewAll = tk.Button(self, text = 'View all students', height = 3, width = 60)
         viewAll.pack(side = tk.TOP, pady = 20)
@@ -136,13 +143,20 @@ class AddClass(tk.Frame):
                 acceptanceMessage.grid(column = 1, padx = (50,0), row = 9, sticky = 'w')
 
                 self.toAdd = tk.StringVar(self)
+                self.toAdd2 = tk.StringVar(self)
                 self.toAdd.set(className)
-                self.var2 = self.controller.frames[AddStudent].classNameMenuLabel
+                self.toAdd2.set(className)
+                self.display1 = self.controller.frames[AddStudent].classNameMenuLabel
                 menu = self.controller.frames[AddStudent].classNameList['menu'] # getting dropdown list from AddStudent class
                 # label = value to add to list, command = set label of dropdown list (self.var2) to the new value when this
                 # value is clicked on
                 # menu.add_command(label=self.toAdd.get(), command=lambda a=self.toAdd.get(): self.var2.set(a))
-                menu.add_command(label=self.toAdd.get(), command= lambda: self.var2.set(self.toAdd.get()))
+                menu.add_command(label=self.toAdd.get(), command= lambda: self.display1.set(self.toAdd.get()))
+
+                self.display2 = self.controller.frames[ViewGrades].classNameMenuLabel
+                menu2 = self.controller.frames[ViewGrades].classList['menu']
+                menu2.add_command(label = self.toAdd2.get(), command = lambda: self.display2.set(self.toAdd2.get()))                
+               # self.controller.allClasses.append(className)
 
         except sqlite3.IntegrityError:
             errorMessage = tk.Label(self, text = 'Enter a unique class name', font = mediumFont)
@@ -195,6 +209,27 @@ class AddStudent(tk.Frame):
                 cursor.execute("INSERT INTO students ([First Name], Surname, Class) VALUES (?,?,?)", (self.firstName, self.lastName, self.className))
                 self.successMsg = tk.Label(self, text = 'Student added                ', font = mediumFont)
                 self.successMsg.grid(column = 3, row = 9, pady = 30, sticky ='w')
+                self.controller.studentClass[self.className] = self.firstName+" "+self.lastName
+                print(self.controller.studentClass)
+        
+        ############################################################################
+        # self.firstNameVariable is created in this class
+        # firstNameVar is a tk.StringVar type from ViewGrades class.
+        self.firstNameVariable = tk.StringVar(self)
+        self.firstNameVariable.set(self.firstName) 
+        self.firstNameDisplay = self.controller.frames[ViewGrades].firstNameVar
+        firstNameMenu = self.controller.frames[ViewGrades].firstNameList['menu']
+        firstNameMenu.add_command(label = self.firstNameVariable.get(), command = lambda: self.firstNameDisplay.set(self.firstNameVariable.get()))
+        # Next Steps - Add same for Surname and reorder ViewGrades Page.
+
+
+        
+              #  self.display2 = self.controller.frames[ViewGrades].classNameMenuLabel
+              #  menu2 = self.controller.frames[ViewGrades].classList['menu']
+              #  menu2.add_command(label = self.toAdd2.get(), command = lambda: self.display2.set(self.toAdd2.get()))  
+
+        self.surnameVariable = tk.StringVar(self)
+        self.surnameVariable.set(self.lastName)
 
 class AddGrades(tk.Frame):
 
@@ -270,13 +305,48 @@ class AddGrades(tk.Frame):
         # in future instead of 'first name' and 'surname' have 2 dropdown boxes
         # 1st: 'Class', once user chooses the class, the next dropdown ('Student') dynamically updates
 
+class ViewGrades(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        self.classNameMenuLabel = tk.StringVar(self)
+      #  self.classNameMenuLabel.trace('w', self.updateOptions)
+        self.classNameMenuLabel.set('Class')
+
+        self.firstNameVar = tk.StringVar(self)
+        self.firstNameVar.set('First Name')
+
+        self.surnameVar = tk.StringVar(self)
+        self.surnameVar.set('Last Name')
+       # self.firstNameLabel.set('First Name')
+        # self.firstNameLabel.trace('w', self.updateOptions)
+
+        self.updatedClassList = [Class[0] for Class in cursor.execute("SELECT [Class Name] FROM classes")]
+        if self.updatedClassList == []:
+            self.updatedClassList.append(None)
+        
+        self.updatedNameList = [Name[0] for Name in cursor.execute("SELECT [First Name] FROM students")]
+        if self.updatedNameList == []:
+            self.updatedNameList.append(None)
+        #print(self.updatedNameList)
+
+        self.firstNameLabel = tk.Label(self, text = 'First Name', font = largeFont)
+        self.firstNameLabel.grid(column = 1, row = 1, padx = (50,10), pady = (50,25), sticky = 'w')
+        self.firstNameList = tk.OptionMenu(self, self.firstNameVar, *self.updatedNameList)
+        self.firstNameList.grid(column = 2, row = 1, padx = 10, pady = 25, sticky = 'w')
+
+        self.surname = tk.Label(self, text = 'Last Name', font = largeFont)
 
 
 
 
-
-
-
+        self.classLabel = tk.Label(self, text = 'Class:', font = largeFont)
+        self.classLabel.grid(column = 1, row = 1, padx = (50,10), pady = (50,25), sticky = 'w')
+        self.classList = tk.OptionMenu(self, self.classNameMenuLabel, *self.updatedClassList)
+        self.classList.config(font = mediumFont)
+        self.classList.grid(column = 2, row = 1, padx = (50,10), pady = (50,25), sticky = 'w')
 
 
 
