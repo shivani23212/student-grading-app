@@ -222,14 +222,11 @@ class AddStudent(tk.Frame):
         firstNameMenu.add_command(label = self.firstNameVariable.get(), command = lambda: self.firstNameDisplay.set(self.firstNameVariable.get()))
         # Next Steps - Add same for Surname and reorder ViewGrades Page.
 
-
-        
-              #  self.display2 = self.controller.frames[ViewGrades].classNameMenuLabel
-              #  menu2 = self.controller.frames[ViewGrades].classList['menu']
-              #  menu2.add_command(label = self.toAdd2.get(), command = lambda: self.display2.set(self.toAdd2.get()))  
-
         self.surnameVariable = tk.StringVar(self)
         self.surnameVariable.set(self.lastName)
+        self.surnameDisplay = self.controller.frames[ViewGrades].surnameVar
+        surnameMenu = self.controller.frames[ViewGrades].surnameList['menu']
+        surnameMenu.add_command(label = self.surnameVariable.get(), command = lambda: self.surnameDisplay.set(self.surnameVariable.get()))
 
 class AddGrades(tk.Frame):
 
@@ -330,24 +327,46 @@ class ViewGrades(tk.Frame):
         self.updatedNameList = [Name[0] for Name in cursor.execute("SELECT [First Name] FROM students")]
         if self.updatedNameList == []:
             self.updatedNameList.append(None)
-        #print(self.updatedNameList)
 
-        self.firstNameLabel = tk.Label(self, text = 'First Name', font = largeFont)
+        self.updatedSurnameList = [Name[0] for Name in cursor.execute("SELECT [Surname] FROM students")]
+        if self.updatedSurnameList == []:
+            self.updatedSurnameList.append(None)
+
+        self.firstNameLabel = tk.Label(self, text = 'First Name:', font = largeFont)
         self.firstNameLabel.grid(column = 1, row = 1, padx = (50,10), pady = (50,25), sticky = 'w')
         self.firstNameList = tk.OptionMenu(self, self.firstNameVar, *self.updatedNameList)
-        self.firstNameList.grid(column = 2, row = 1, padx = 10, pady = 25, sticky = 'w')
+        self.firstNameList.config(font = mediumFont)
+        self.firstNameList.grid(column = 2, row = 1, padx = (50,10), pady = (50,25), sticky = 'w')
 
-        self.surname = tk.Label(self, text = 'Last Name', font = largeFont)
-
-
-
+        self.surnameLabel = tk.Label(self, text = 'Last Name:', font = largeFont)
+        self.surnameLabel.grid(column = 1, row = 3, padx = (50,10), pady = 25, sticky = 'w')
+        self.surnameList = tk.OptionMenu(self, self.surnameVar, *self.updatedSurnameList)
+        self.surnameList.config(font = mediumFont)
+        self.surnameList.grid(column = 2, row = 3, padx = (50,10), pady = 25, sticky = 'w')
 
         self.classLabel = tk.Label(self, text = 'Class:', font = largeFont)
-        self.classLabel.grid(column = 1, row = 1, padx = (50,10), pady = (50,25), sticky = 'w')
+        self.classLabel.grid(column = 1, row = 5, padx = (50,10), pady = 25, sticky = 'w')
         self.classList = tk.OptionMenu(self, self.classNameMenuLabel, *self.updatedClassList)
         self.classList.config(font = mediumFont)
-        self.classList.grid(column = 2, row = 1, padx = (50,10), pady = (50,25), sticky = 'w')
+        self.classList.grid(column = 2, row = 5, padx = (50,10), pady = 25, sticky = 'w')
 
+        self.findStudentButton = tk.Button(self, text = 'Find Student', font = mediumFont, command = self.findStudent)
+        self.findStudentButton.grid(column = 2, row = 7, pady = 25, sticky = 'w', padx = 50)
+
+    def findStudent(self):
+        firstName, surname, myClass = self.firstNameVar.get(), self.surnameVar.get(), self.classNameMenuLabel.get()
+        
+        try:
+            cursor.execute('''SELECT Autumn1, Autumn2, Spring1, Spring2, Summer1, Summer2 FROM students
+             WHERE [First Name] LIKE ? AND Surname LIKE ? AND Class LIKE ?''', (firstName, surname, myClass))
+           # results = cursor.fetchall()
+            results = list(cursor.fetchone()) # stores the first set of values returned by cursor
+           # results = results.split(',')
+            print(results)
+        except:
+            pass
+
+# cursor.execute('SELECT * FROM students WHERE [First Name] LIKE ? AND [Surname] LIKE ?',(self.firstName, self.lastName))
 
 
 app = backEnd() # equivilant of root = Tk (since backEnd() inherits from Tk)
