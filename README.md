@@ -26,3 +26,7 @@ Declaring multiple variables on the same line: https://stackoverflow.com/questio
 Dropdown List Issue Solution: https://stackoverflow.com/questions/17252096/change-optionmenu-based-on-what-is-selected-in-another-optionmenu
 
 Check whether value exists in table (Sqlite): https://stackoverflow.com/questions/45569344/how-to-tell-if-a-value-exists-in-a-sqlite3-database-python
+
+Select from multiple columns: https://www.tutorialspoint.com/sqlite/sqlite_and_or_clauses.htm
+
+Convert Tuple to List: https://stackoverflow.com/questions/16296643/convert-tuple-to-list-and-back
