@@ -5,8 +5,9 @@ import sqlite3
 conn = sqlite3.connect('school.db')
 cursor = conn.cursor()
 
-largeFont = ("Verdana",20)
-mediumFont = font = ("Verdana",15)
+largeFont = ("Verdana",15)
+mediumFont = ("Verdana",12)
+smallFont =  ("Verdana", 10)
 
 class backEnd(tk.Tk): # pass in Tk module of tk
 
@@ -353,18 +354,27 @@ class ViewGrades(tk.Frame):
         self.findStudentButton = tk.Button(self, text = 'Find Student', font = mediumFont, command = self.findStudent)
         self.findStudentButton.grid(column = 2, row = 7, pady = 25, sticky = 'w', padx = 50)
 
+        self.backButton = tk.Button(self, text = 'Back', font = mediumFont, command = lambda: self.controller.showFrame(TeacherMenu))
+        self.backButton.grid(column = 1, row = 7, pady = 25, sticky = 'w', padx = (50,25))
+
     def findStudent(self):
         firstName, surname, myClass = self.firstNameVar.get(), self.surnameVar.get(), self.classNameMenuLabel.get()
         
         try:
             cursor.execute('''SELECT Autumn1, Autumn2, Spring1, Spring2, Summer1, Summer2 FROM students
              WHERE [First Name] LIKE ? AND Surname LIKE ? AND Class LIKE ?''', (firstName, surname, myClass))
-           # results = cursor.fetchall()
             results = list(cursor.fetchone()) # stores the first set of values returned by cursor
-           # results = results.split(',')
-            print(results)
+            terms = ['Autumn 1:', 'Autumn 2:', 'Spring 1:', 'Spring 2:', 'Summer 1:', 'Summer 2:']
+            for i in range(6):
+                termLabel_i = tk.Label(self, text = terms[i], font = smallFont)
+                termLabel_i.grid(column = 1, row = 8 + i, padx = (50, 10), pady = 25, sticky = 'w')
+
+                scoreLabel_i = tk.Label(self, text = results[i], font = smallFont)
+                scoreLabel_i.grid(column = 2, row = 8 + i, padx = (50, 10), pady = 25, sticky = 'w')
+            generateGraphButton = tk.Button(self, text = 'Generate Graph', font = mediumFont)
+            generateGraphButton.grid(column = 3, row = 1, padx = 50, pady = 50, sticky = 'w')
         except:
-            pass
+             pass
 
 # cursor.execute('SELECT * FROM students WHERE [First Name] LIKE ? AND [Surname] LIKE ?',(self.firstName, self.lastName))
 
