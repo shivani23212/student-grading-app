@@ -376,21 +376,26 @@ class ViewGrades(tk.Frame):
 
                 scoreLabel_i = tk.Label(self, text = results[i], font = smallFont)
                 scoreLabel_i.grid(column = 2, row = 8 + i, padx = (50, 10), pady = 25, sticky = 'w')
-            generateGraphButton = tk.Button(self, text = 'Generate Graph', font = mediumFont, command = self.addGraph)
+            generateGraphButton = tk.Button(self, text = 'Generate Graph', font = mediumFont, command = lambda: self.addGraphPopUp(results))
             generateGraphButton.grid(column = 3, row = 1, padx = 50, pady = 50, sticky = 'w')
         except:
              pass
     
-    def addGraph(self):
-        f = Figure(figsize = (5,5), dpi = 100)
+    def addGraphPopUp(self, results):
+        popup = tk.Tk()
+        popup.wm_title('Student Results Graph')
+        f = Figure(figsize = (6,6), dpi = 100)
         a = f.add_subplot(111) # adds to 1 chart
-        a.plot([1,2,3,4,5,6,7,8],[4,6,2,5,2,7,5,4])
+        my_xticks = ['Autumn 1', 'Autumn 2', 'Spring 1', 'Spring 2', 'Summer 1', 'Summer 2']
+        y = [results[0],results[1], results[2], results[3], results[4], results[5]]
+        a.plot(my_xticks,y)
 
-        canvas = FigureCanvasTkAgg(f, self)
+        canvas = FigureCanvasTkAgg(f, popup)
         canvas.draw()
         canvas.get_tk_widget().grid(column = 7, row = 5)
 
-# cursor.execute('SELECT * FROM students WHERE [First Name] LIKE ? AND [Surname] LIKE ?',(self.firstName, self.lastName))
+        closeButton = tk.Button(popup, text = 'Close', command = popup.destroy)
+        closeButton.grid(column = 1, row = 15)
 
 
 app = backEnd() # equivilant of root = Tk (since backEnd() inherits from Tk)
