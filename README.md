@@ -30,3 +30,7 @@ Check whether value exists in table (Sqlite): https://stackoverflow.com/question
 Select from multiple columns: https://www.tutorialspoint.com/sqlite/sqlite_and_or_clauses.htm
 
 Convert Tuple to List: https://stackoverflow.com/questions/16296643/convert-tuple-to-list-and-back
+
+Use MatPlotLib in tkinter: https://www.youtube.com/watch?v=Zw6M-BnAPP0
+
+Pass arguments in tkinter without functools: https://stackoverflow.com/questions/6920302/how-to-pass-arguments-to-a-button-command-in-tkinter
