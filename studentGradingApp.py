@@ -2,6 +2,11 @@ import tkinter as tk
 from functools import partial
 import sqlite3
 
+import matplotlib
+matplotlib.use("TkAgg") # backend of mpl
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.figure import Figure
+
 conn = sqlite3.connect('school.db')
 cursor = conn.cursor()
 
@@ -371,10 +376,19 @@ class ViewGrades(tk.Frame):
 
                 scoreLabel_i = tk.Label(self, text = results[i], font = smallFont)
                 scoreLabel_i.grid(column = 2, row = 8 + i, padx = (50, 10), pady = 25, sticky = 'w')
-            generateGraphButton = tk.Button(self, text = 'Generate Graph', font = mediumFont)
+            generateGraphButton = tk.Button(self, text = 'Generate Graph', font = mediumFont, command = self.addGraph)
             generateGraphButton.grid(column = 3, row = 1, padx = 50, pady = 50, sticky = 'w')
         except:
              pass
+    
+    def addGraph(self):
+        f = Figure(figsize = (5,5), dpi = 100)
+        a = f.add_subplot(111) # adds to 1 chart
+        a.plot([1,2,3,4,5,6,7,8],[4,6,2,5,2,7,5,4])
+
+        canvas = FigureCanvasTkAgg(f, self)
+        canvas.draw()
+        canvas.get_tk_widget().grid(column = 7, row = 5)
 
 # cursor.execute('SELECT * FROM students WHERE [First Name] LIKE ? AND [Surname] LIKE ?',(self.firstName, self.lastName))
 
