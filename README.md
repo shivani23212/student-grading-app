@@ -34,3 +34,7 @@ Convert Tuple to List: https://stackoverflow.com/questions/16296643/convert-tupl
 Use MatPlotLib in tkinter: https://www.youtube.com/watch?v=Zw6M-BnAPP0
 
 Pass arguments in tkinter without functools: https://stackoverflow.com/questions/6920302/how-to-pass-arguments-to-a-button-command-in-tkinter
+
+Add title and axis labels to MatPlotLib graph: https://python-graph-gallery.com/4-add-title-and-axis-label/, https://stackoverflow.com/questions/38662667/matplotlib-and-subplots-properties
+
+Change size of text label and make bold: https://stackoverflow.com/questions/35441749/change-size-of-text-on-label-by-tkinter, https://stackoverflow.com/questions/46495160/make-a-label-bold-tkinter
