@@ -83,17 +83,20 @@ class TeacherMenu(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
+        titleLabel = tk.Label(self, text = 'Teacher Menu', font = (None, 30, 'bold'))
+        titleLabel.pack(side = tk.TOP, pady = (60, 0))
+
         addClass = tk.Button(self, text = 'Add new class', height = 3, width = 60, command = lambda: self.controller.showFrame(AddClass))
-        addClass.pack(side = tk.TOP, pady = (175,20))
+        addClass.pack(side = tk.TOP, pady = (85,20))
         addStudent = tk.Button(self, text = 'Add new student', height = 3, width = 60, command = lambda: self.controller.showFrame(AddStudent))
         addStudent.pack(side = tk.TOP, pady = 20)
         addGrades = tk.Button(self, text = 'Add new grades', height = 3, width = 60, command = lambda: self.controller.showFrame(AddGrades))
         addGrades.pack(side = tk.TOP, pady = 20)
         analyse = tk.Button(self, text = 'View Grades', height = 3, width = 60, command = lambda: self.controller.showFrame(ViewGrades))
         analyse.pack(side = tk.TOP, pady = 20)
-        viewAll = tk.Button(self, text = 'View all students', height = 3, width = 60)
+        viewAll = tk.Button(self, text = 'Something Else', height = 3, width = 60)
         viewAll.pack(side = tk.TOP, pady = 20)
-        changes = tk.Button(self, text = 'Make Changes', height = 3, width = 60)
+        changes = tk.Button(self, text = 'Back', height = 3, width = 60, command = lambda: self.controller.showFrame(StartPage))
         changes.pack(side = tk.TOP, pady = 20)
 
 
@@ -379,17 +382,27 @@ class ViewGrades(tk.Frame):
             generateGraphButton = tk.Button(self, text = 'Generate Graph', font = mediumFont, command = lambda: self.addGraphPopUp(results))
             generateGraphButton.grid(column = 3, row = 1, padx = 50, pady = 50, sticky = 'w')
         except:
-             pass
-    
+            errorPopup = tk.Tk()
+            errorPopup.wm_title('Error')
+            errorLabel = tk.Label(errorPopup, text = 'This student does not exist.')
+            errorLabel.grid(column = 1, row = 1)
+            exitButton = tk.Button(errorPopup, text = 'Exit', command = errorPopup.destroy)
+            exitButton.grid(column = 1, columnspan = 1)
+
     def addGraphPopUp(self, results):
         popup = tk.Tk()
         popup.wm_title('Student Results Graph')
         f = Figure(figsize = (6,6), dpi = 100)
         a = f.add_subplot(111) # adds to 1 chart
+
+        a.set_title('Assessment Results')
+        a.set_xlabel('Term')
+        a.set_ylabel('Percentage')
+
         my_xticks = ['Autumn 1', 'Autumn 2', 'Spring 1', 'Spring 2', 'Summer 1', 'Summer 2']
         y = [results[0],results[1], results[2], results[3], results[4], results[5]]
         a.plot(my_xticks,y)
-
+  
         canvas = FigureCanvasTkAgg(f, popup)
         canvas.draw()
         canvas.get_tk_widget().grid(column = 7, row = 5)
@@ -397,9 +410,6 @@ class ViewGrades(tk.Frame):
         closeButton = tk.Button(popup, text = 'Close', command = popup.destroy)
         closeButton.grid(column = 1, row = 15)
 
-
 app = backEnd() # equivilant of root = Tk (since backEnd() inherits from Tk)
 app.state('zoomed') # makes window fullscreen
 app.mainloop()
-
-# create a students class. The class should hold a dictionary for each term and the number of times marks have been submitted.
